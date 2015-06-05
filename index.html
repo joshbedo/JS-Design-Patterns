@@ -103,6 +103,22 @@ export default AbstractDataType;
 
 <p><b>What benefit does private encapsulation offer JavaScript?</b> Well one of the huge benefits is having a flexible API, in the long run you can keep public methods <i>frozen</i> but still change internal private methods to make the internals more robust. That way as additional complexity is introduced to fulfill features requirements you don't have to worry about breaking other components. Another benefit is you can restrict access to things you don't want malicious users to use or see. ( not full proof since everything on the client-side is always available to the client, it's better to rely on server-side for security. ) </p>
 
+<h2>Observer Pattern</h2>
+<p>Another popular pattern that is being simplified in ES6/ES7 is the <b>Observer Pattern</b>. If you're not familiar the <b>Observer Pattern</b> is a design pattern in which an object (known as the subject) maintains a list of objects depending on what it observes (observers), automatically notifying them of any changes to state. In ES5 this was a little cumbersome to setup but not difficult. You created a <b>ObserverList constructor function</b> which creates an empty list of observers. After that you create an interface of public prototype methods for tasks like adding, deleting, etc. Now it's much more simple we have a handy dandy <code>Object.observe</code> method we can use to do the same job with a lot less code.</p>
+<pre><code>
+/*
+ * Observer Pattern
+ */
+var model = {};
+
+Object.observe(model, function(changes) {
+  // async callback
+  changes.forEach(function(change) {
+    console.log(change.type, change.name, change.oldValue);
+  });
+});
+</code></pre>
+
         </section>
 
         <aside id="sidebar">

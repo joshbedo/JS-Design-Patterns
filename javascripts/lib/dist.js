@@ -32,9 +32,9 @@ var civic = new Car({
   miles: 50000
 });
 
-console.group('constructor');
+console.group('Constructor');
 console.log('constructor', civic);
-console.log('toString()', civic.toString());
+console.log('toString() prototype method', civic.toString());
 console.groupEnd('constructor');
 'use strict';
 
@@ -63,9 +63,6 @@ var AbstractDataType = (function () {
     key: 'addItem',
     value: function addItem(item) {
       shoppingList.get(this).push(item);
-      // var list = shoppingList.get(this);
-      // list.push(item);
-      // shoppingList.set(this, list)
     }
   }]);
 
@@ -80,3 +77,19 @@ console.log('private member shoppingList (undefined)', ADT.shoppingList);
 ADT.addItem('candy');
 console.log('getShoppingList() after adding item', ADT.getShoppingList());
 console.groupEnd();
+'use strict';
+
+var model = {};
+
+Object.observe(model, function (changes) {
+  console.group('Observer');
+  // async callback
+  changes.forEach(function (change) {
+    console.log(change.type, change.name, change.oldValue);
+  });
+  console.groupEnd();
+});
+
+model.first_name = 'Josh';
+model.last_name = 'Bedo';
+model.age = 22;

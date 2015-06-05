@@ -19,7 +19,7 @@ var civic = new Car({
   miles: 50000
 });
 
-console.group('constructor');
+console.group('Constructor');
 console.log('constructor', civic);
-console.log('toString()', civic.toString());
+console.log('toString() prototype method', civic.toString());
 console.groupEnd('constructor');
