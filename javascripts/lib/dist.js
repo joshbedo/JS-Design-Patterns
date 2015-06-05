@@ -77,6 +77,9 @@ console.log('private member shoppingList (undefined)', ADT.shoppingList);
 ADT.addItem('candy');
 console.log('getShoppingList() after adding item', ADT.getShoppingList());
 console.groupEnd();
+/*
+ * Observer Pattern
+ */
 'use strict';
 
 var model = {};
@@ -93,3 +96,73 @@ Object.observe(model, function (changes) {
 model.first_name = 'Josh';
 model.last_name = 'Bedo';
 model.age = 22;
+/*
+ * Publish/Subscribe Pattern
+ */
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var PubSub = (function () {
+  function PubSub() {
+    _classCallCheck(this, PubSub);
+
+    this.handlers = [];
+  }
+
+  _createClass(PubSub, [{
+    key: 'subscribe',
+    value: function subscribe(event, handler, context) {
+      if (typeof context === 'undefined') {
+        context = handler;
+      }
+      this.handlers.push({ event: event, handler: handler.bind(context) });
+    }
+  }, {
+    key: 'publish',
+    value: function publish(event, args) {
+      this.handlers.forEach(function (channel) {
+        if (channel.event === event) {
+          channel.handler(args);
+        }
+      });
+    }
+  }]);
+
+  return PubSub;
+})();
+
+/*
+ * Simple ChatRoom Class
+ * uses the PubSub Class to notify other users when a message is sent.
+ */
+
+var ChatRoom = (function () {
+  function ChatRoom() {
+    _classCallCheck(this, ChatRoom);
+
+    this.pubsub = new PubSub();
+    this.pubsub.subscribe('message', this.emitMessage, this);
+  }
+
+  _createClass(ChatRoom, [{
+    key: 'emitMessage',
+    value: function emitMessage(msg) {
+      console.group('PubSub');
+      console.log('user sent message!', msg);
+      console.groupEnd();
+    }
+  }, {
+    key: 'sendMessage',
+    value: function sendMessage() {
+      this.pubsub.publish('message', 'Hey, how are you?');
+    }
+  }]);
+
+  return ChatRoom;
+})();
+
+var room = new ChatRoom();
+room.sendMessage();

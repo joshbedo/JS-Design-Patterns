@@ -119,6 +119,57 @@ Object.observe(model, function(changes) {
 });
 </code></pre>
 
+<h2>Publish/Subscribe Pattern</h2>
+<p>Another simple but useful pattern is the <b>Publish/Subscribe Pattern</b>. Publish/Subscribe is just another variant of the <b>Observer Pattern</b>. The main difference is that the <b>Observer Pattern</b> requires that the <b>observer</b> receiving notifications must subscribe to the object firing the event (the subject). The <b>Publish/Subscribe Pattern</b> however uses a topic/event channel that sits between the objects waiting to receive notifications (subscribers) and waiting for the object firing the events (the publisher). This allows you to avoid dependencies between the subscriber and publisher.
+<pre><code>
+/*
+ * Publish/Subscribe Pattern
+ */
+class PubSub {
+  constructor() {
+    this.handlers = [];
+  }
+
+  subscribe(event, handler, context) {
+    if (typeof context === 'undefined') { context = handler; }
+    this.handlers.push({ event: event, handler: handler.bind(context) });
+  }
+
+  publish(event, args) {
+    this.handlers.forEach(topic => {
+      if (topic.event === event) {
+        topic.handler(args)
+      }
+    })
+  }
+}
+
+/*
+ * Simple ChatRoom Class
+ * uses the PubSub Class to notify other users when a message is sent.
+ */
+class ChatRoom {
+  constructor() {
+    this.pubsub = new PubSub();
+    this.pubsub.subscribe('message', this.emitMessage, this);
+  }
+
+  emitMessage(msg) {
+    console.group('PubSub')
+    console.log('user sent message!', msg);
+    console.groupEnd();
+  }
+
+  sendMessage() {
+    this.pubsub.publish('message', 'Hey, how are you?');
+  }
+
+}
+
+var room = new ChatRoom();
+room.sendMessage();
+</code></pre>
+
         </section>
 
         <aside id="sidebar">
