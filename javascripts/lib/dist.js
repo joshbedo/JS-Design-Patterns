@@ -36,6 +36,88 @@ console.group('Constructor');
 console.log('constructor', civic);
 console.log('toString() prototype method', civic.toString());
 console.groupEnd('constructor');
+/*
+ * Publish/Subscribe Pattern
+ */
+'use strict';
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var PubSub = (function () {
+  function PubSub() {
+    _classCallCheck(this, PubSub);
+
+    this.handlers = [];
+  }
+
+  _createClass(PubSub, [{
+    key: 'subscribe',
+    value: function subscribe(event, handler, context) {
+      if (typeof context === 'undefined') {
+        context = handler;
+      }
+      this.handlers.push({ event: event, handler: handler.bind(context) });
+    }
+  }, {
+    key: 'publish',
+    value: function publish(event, args) {
+      this.handlers.forEach(function (topic) {
+        if (topic.event === event) {
+          topic.handler(args);
+        }
+      });
+    }
+  }]);
+
+  return PubSub;
+})();
+
+/*
+ * Mediator Pattern
+ */
+
+var Mediator = (function (_PubSub) {
+  function Mediator(opts) {
+    _classCallCheck(this, Mediator);
+
+    _get(Object.getPrototypeOf(Mediator.prototype), 'constructor', this).call(this);
+  }
+
+  _inherits(Mediator, _PubSub);
+
+  _createClass(Mediator, [{
+    key: 'attachToObject',
+    value: function attachToObject(obj) {
+      obj.handlers = [];
+      obj.publish = this.publish;
+      obj.subscribe = this.subscribe;
+    }
+  }]);
+
+  return Mediator;
+})(PubSub);
+
+var mediator = new Mediator();
+
+var myRoom = {
+  name: 'myRoom'
+};
+
+mediator.attachToObject(myRoom);
+
+myRoom.subscribe('connection', function () {
+  console.group('Mediator');
+  console.log('user connected to ' + myRoom.name + '!');
+  console.groupEnd();
+}, myRoom);
+
+myRoom.publish('connection');
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -123,9 +205,9 @@ var PubSub = (function () {
   }, {
     key: 'publish',
     value: function publish(event, args) {
-      this.handlers.forEach(function (channel) {
-        if (channel.event === event) {
-          channel.handler(args);
+      this.handlers.forEach(function (topic) {
+        if (topic.event === event) {
+          topic.handler(args);
         }
       });
     }
