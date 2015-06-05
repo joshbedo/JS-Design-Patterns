@@ -29,14 +29,14 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h2>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Constructors</h2>
+<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Constructor Pattern</h2>
 
 <p>The below example is a simple way to setup a constructor which is used to instantiate a new object. Before ES6 this would look a little different, you don't have the <b>Class</b> keyword available and you would just create a <b>constructor function</b>.</p>
 <pre><code class='javascript'>
 /*
  * Constructor Pattern
  */
-export default class Car {
+class Car {
   constructor(opts) {
     this.model = opts.model;
     this.year = opts.year;
@@ -67,27 +67,42 @@ Car.prototype.toString = function() {
 }
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h2>Module Pattern</h2>
+<p>Classes in ES6 are also the new way of doing the <b>Module Pattern</b> which simply allows you to keep units of code cleanly separated and organized. The main difference with ES6 classes are how you handle private encapsulation. The example below shows a basic example of private encapsulation.</p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<pre><code>
+/* lib/module.js */
+const shoppingList = new WeakMap();
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+/**
+ * Module Pattern
+ */
+class AbstractDataType {
+  constructor() {
+    // woo! our Class is instantiated lets add some private properties.
+    shoppingList.set(this, ['coffee', 'chicken', 'pizza'])
+  }
 
-<h3>
-<a id="rather-drive-stick" class="anchor" href="#rather-drive-stick" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+  // Lets create a public prototype method to access our private `shoppingList`
+  getShoppingList() {
+    return shoppingList.get(this);
+  }
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+  addItem(item) {
+    shoppingList.get(this).push(item);
+  }
+}
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+// Now we export our `Class` which will become an importable module.
+export default AbstractDataType;
+</code></pre>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p><b>WeakMap</b> is also a new ES6 feature that seems to be a good option for creating private memebers. It accepts any value as a key and doesn't prevent the key object from getting garbage collected when the <b>WeakMap</b> object still exists. It remove any entry containing the object once it's garbage collected.</p>
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p>If you haven't been following <b>Modules</b> for ES6 the <code>export default AbstractDataType</code> is simply exporting our class so we can later use <code>import AbstractDataType from 'libs/module';</code>. There is a great article going further in depth with how the module system works <a title='ES6 Modules' href='http://www.2ality.com/2014/09/es6-modules-final.html' target='_blank'>here</a>.</p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="https://help.github.com/pages">https://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p><b>What benefit does private encapsulation offer JavaScript?</b> Well one of the huge benefits is having a flexible API, in the long run you can keep public methods <i>frozen</i> but still change internal private methods to make the internals more robust. That way as additional complexity is introduced to fulfill features requirements you don't have to worry about breaking other components. Another benefit is you can restrict access to things you don't want malicious users to use or see. ( not full proof since everything on the client-side is always available to the client, it's better to rely on server-side for security. ) </p>
+
         </section>
 
         <aside id="sidebar">
