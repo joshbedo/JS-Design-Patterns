@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>JavaScript Design Patterns by joshbedo</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+          <h1>JavaScript Design Patterns</h1>
+        <h2>JavaScript Design Patterns in ES 2015</h2>
+        <a href="https://github.com/joshbedo/JS-Design-Patterns" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <i><b>NOTE:</b> code samples are inside <b>gh-pages</b> branch and you can see the output inside the console (CTRL+OPT+I)</i>
+          <h2>
+<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Constructor Pattern</h2>
+
+<p>The below example is a simple way to setup a constructor which is used to instantiate a new object. Before ES6 this would look a little different, you don't have the <b>Class</b> keyword available and you would just create a <b>constructor function</b>.</p>
+<pre><code class='javascript'>
+/*
+ * Constructor Pattern
+ */
+class Car {
+  constructor(opts) {
+    this.model = opts.model;
+    this.year = opts.year;
+    this.miles = opts.miles;
+  }
+
+  // Prototype method
+  toString() {
+    return `${this.model} has driven ${this.miles} miles`;
+  }
+}
+
+// Usage:
+var civic = new Car({
+  model: 'Honda',
+  year: 2001,
+  miles: 50000
+});
+
+// ES5 Example of constructor function
+function Car() {
+  this.model = opts.model;
+  ...
+  ...
+}
+Car.prototype.toString = function() {
+  ...
+}
+</code></pre>
+
+<h2>Module Pattern</h2>
+<p>Classes in ES6 are also the new way of doing the <b>Module Pattern</b> which simply allows you to keep units of code cleanly separated and organized. The main difference with ES6 classes are how you handle private encapsulation. The example below shows a basic example of private encapsulation.</p>
+
+<pre><code>
+/* lib/module.js */
+const shoppingList = new WeakMap();
+
+/**
+ * Module Pattern
+ */
+class AbstractDataType {
+  constructor() {
+    // woo! our Class is instantiated lets add some private properties.
+    shoppingList.set(this, ['coffee', 'chicken', 'pizza'])
+  }
+
+  // Lets create a public prototype method to access our private `shoppingList`
+  getShoppingList() {
+    return shoppingList.get(this);
+  }
+
+  addItem(item) {
+    shoppingList.get(this).push(item);
+  }
+}
+
+// Now we export our `Class` which will become an importable module.
+export default AbstractDataType;
+</code></pre>
+
+<p><b>WeakMap</b> is also a new ES6 feature that seems to be a good option for creating private memebers. It accepts any value as a key and doesn't prevent the key object from getting garbage collected when the <b>WeakMap</b> object still exists. It remove any entry containing the object once it's garbage collected.</p>
+
+<p>If you haven't been following <b>Modules</b> for ES6 the <code>export default AbstractDataType</code> is simply exporting our class so we can later use <code>import AbstractDataType from 'libs/module';</code>. There is a great article going further in depth with how the module system works <a title='ES6 Modules' href='http://www.2ality.com/2014/09/es6-modules-final.html' target='_blank'>here</a>.</p>
+
+<p><b>What benefit does private encapsulation offer JavaScript?</b> Well one of the huge benefits is having a flexible API, in the long run you can keep public methods <i>frozen</i> but still change internal private methods to make the internals more robust. That way as additional complexity is introduced to fulfill features requirements you don't have to worry about breaking other components. Another benefit is you can restrict access to things you don't want malicious users to use or see. ( not full proof since everything on the client-side is always available to the client, it's better to rely on server-side for security. ) </p>
+
+<h2>Observer Pattern</h2>
+<p>Another popular pattern that is being simplified in ES6/ES7 is the <b>Observer Pattern</b>. If you're not familiar the <b>Observer Pattern</b> is a design pattern in which an object (known as the subject) maintains a list of objects depending on what it observes (observers), automatically notifying them of any changes to state. In ES5 this was a little cumbersome to setup but not difficult. You created a <b>ObserverList constructor function</b> which creates an empty list of observers. After that you create an interface of public prototype methods for tasks like adding, deleting, etc. Now it's much more simple we have a handy dandy <code>Object.observe</code> method we can use to do the same job with a lot less code.</p>
+<pre><code>
+/*
+ * Observer Pattern
+ */
+var model = {};
+
+Object.observe(model, function(changes) {
+  // async callback
+  changes.forEach(function(change) {
+    console.log(change.type, change.name, change.oldValue);
+  });
+});
+</code></pre>
+
+<h2>Publish/Subscribe Pattern</h2>
+<p>Another simple but useful pattern is the <b>Publish/Subscribe Pattern</b>. Publish/Subscribe is just another variant of the <b>Observer Pattern</b>. The main difference is that the <b>Observer Pattern</b> requires that the <b>observer</b> receiving notifications must subscribe to the object firing the event (the subject). The <b>Publish/Subscribe Pattern</b> however uses a topic/event channel that sits between the objects waiting to receive notifications (subscribers) and waiting for the object firing the events (the publisher). This allows you to avoid dependencies between the subscriber and publisher.
+<pre><code>
+/*
+ * Publish/Subscribe Pattern
+ */
+class PubSub {
+  constructor() {
+    this.handlers = [];
+  }
+
+  subscribe(event, handler, context) {
+    if (typeof context === 'undefined') { context = handler; }
+    this.handlers.push({ event: event, handler: handler.bind(context) });
+  }
+
+  publish(event, args) {
+    this.handlers.forEach(topic => {
+      if (topic.event === event) {
+        topic.handler(args)
+      }
+    })
+  }
+}
+
+/*
+ * Simple ChatRoom Class
+ * uses the PubSub Class to notify other users when a message is sent.
+ */
+class ChatRoom {
+  constructor() {
+    this.pubsub = new PubSub();
+    this.pubsub.subscribe('message', this.emitMessage, this);
+  }
+
+  emitMessage(msg) {
+    console.group('PubSub')
+    console.log('user sent message!', msg);
+    console.groupEnd();
+  }
+
+  sendMessage() {
+    this.pubsub.publish('message', 'Hey, how are you?');
+  }
+
+}
+
+var room = new ChatRoom();
+room.sendMessage();
+</code></pre>
+<h2>Mediator Pattern</h2>
+<p>If you're not familiar with the <b>Mediator Pattern</b> it's a pattern that acts as a unified interface through which the different components of an application may communicate. If a unit of code has too many direct relationships between components, it may be time to have a central point of control that components can communicate through.</p>
+
+<i>A traffic light (mediator) handles which cars can go and stop, because all communications (notifications) are performed from the traffic light, rather than from car to car. Could you imagine communicating to other drivers as they come by? :)
+</i>
+<pre><code>
+/*
+ * Publish/Subscribe Pattern
+ */
+class PubSub {
+  constructor() {
+    this.handlers = [];
+  }
+
+  subscribe(event, handler, context) {
+    if (typeof context === 'undefined') { context = handler; }
+    this.handlers.push({ event: event, handler: handler.bind(context) });
+  }
+
+  publish(event, args) {
+    this.handlers.forEach(topic => {
+      if (topic.event === event) {
+        topic.handler(args)
+      }
+    })
+  }
+}
+
+/*
+ * Mediator Pattern
+ */
+class Mediator extends PubSub {
+  constructor(opts) {
+    super();
+  }
+
+  attachToObject(obj) {
+    obj.handlers = [];
+    obj.publish = this.publish;
+    obj.subscribe = this.subscribe;
+  }
+}
+
+var mediator = new Mediator();
+
+var myRoom = {
+  name: 'myRoom'
+};
+
+mediator.attachToObject(myRoom);
+
+myRoom.subscribe('connection', function() {
+  console.group('Mediator');
+  console.log(`user connected to ${myRoom.name}!`);
+  console.groupEnd();
+}, myRoom);
+
+myRoom.publish('connection');
+</code></pre>
+
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/joshbedo/JS-Design-Patterns/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/joshbedo/JS-Design-Patterns/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+        </aside>
+      </div>
+    </div>
+
+  <script type='text/javascript' src='javascripts/lib/dist.js'></script>
+  </body>
+</html>
